@@ -2,16 +2,25 @@
   <div>
     <!-- 新增按钮 -->
     <slot>
-      <div v-if="isShowAdd" class="ele-table-editor-btn">
-        <el-button type="primary" @click="handleAdd">{{
+      <div class="ele-table-editor-btn">
+        <el-button v-if="isShowAdd" type="success" size="mini" @click="handleAdd">{{
           addBtnText
         }}</el-button>
+        <el-button
+          v-for="(btn, index) of tabExtraBtns"
+          :key="index"
+          v-bind="btn.attrs"
+          :style="btn.style"
+          @click="btn.click()"
+          >{{ btn.text }}</el-button
+        >
       </div>
     </slot>
 
     <!-- element-ui table 组件 -->
     <el-table
       class="ele-table-editor"
+	  size="mini"
       :data="value"
       v-bind="tableAttrs"
       v-on="tableOn"
@@ -76,6 +85,30 @@
                       @change="
                         emitChange(
                           contentItem.change,
+                          $event,
+                          scope.row,
+                          scope.$index
+                        )
+                      "
+					   @submitdata="
+                        emitSubmitdata(
+                          contentItem.submitdata,
+                          $event,
+                          scope.row,
+                          scope.$index
+                        )
+                      "
+                      @setSelected="
+                        emitSetSelected(
+                          contentItem.setSelected,
+                          $event,
+                          scope.row,
+                          scope.$index
+                        )
+                      "
+                      @setSubject="
+                        emitSetSubject(
+                          contentItem.setSubject,
                           $event,
                           scope.row,
                           scope.$index
@@ -211,6 +244,11 @@ export default {
       type: Array,
       default: null
     },
+	//表头按钮
+    tabExtraBtns: {
+      type: Array,
+      default: null
+    },
     // table 列
     columns: {
       type: Array,
@@ -316,6 +354,21 @@ export default {
     emitChange(change, val, row, index) {
       if (change) {
         change(val, row, index)
+      }
+    },
+	 emitSubmitdata(submitdata, val, row, index) {
+      if (submitdata) {
+        submitdata(val, row, index)
+      }
+    },
+    emitSetSelected(setSelected, val, row, index) {
+      if (setSelected) {
+        setSelected(val, row, index)
+      }
+    },
+    emitSetSubject(setSubject, val, row, index) {
+      if (setSubject) {
+        setSubject(val, row, index)
       }
     },
     // 值变化
